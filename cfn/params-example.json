@@ -1,0 +1,14 @@
+[
+  {
+    "ParameterKey": "sourceBucket",
+    "ParameterValue": "my-lambda-functions"
+  },
+  {
+    "ParameterKey": "sourceKey",
+    "ParameterValue": "webmonitor.zip"
+  },
+  {
+    "ParameterKey": "phoneNumber",
+    "ParameterValue": "16507891234"
+  }
+]

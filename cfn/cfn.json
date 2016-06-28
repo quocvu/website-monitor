@@ -1,0 +1,123 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+
+  "Description": "Standup SNS topic, subcription, and S3 bucket for this app to use",
+
+  "Metadata": {
+    "Description": "Monitor website pages and send SMS if the page is not available"
+  },
+
+  "Parameters": {
+    "sourceBucket": {
+      "Description": "S3 bucket containing the lambda function deployment package",
+      "Type": "String"
+    },
+
+    "sourceKey": {
+      "Description": "S3 object key of the lambda function deployment package",
+      "Type": "String"
+    },
+
+    "phoneNumber": {
+      "Description": "Phone number to send SMS messages to",
+      "Type": "String"
+    }
+  },
+
+  "Resources": {
+    "errorCountBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "Tags": [
+          { "Key": "app", "Value": "web-monitor" },
+          { "Key": "usage", "Value": "store-error-counts" }
+        ]
+      }
+    },
+
+    "alertsTopic": {
+      "Type": "AWS::SNS::Topic",
+      "Properties": {
+        "DisplayName": "Website-monitor",
+        "Subscription": [
+          {
+            "Endpoint": { "Ref": "phoneNumber" },
+            "Protocol": "sms"
+          }
+        ]
+      }
+    },
+
+    "monitorRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "Path": "/",
+        "AssumeRolePolicyDocument": {
+          "Version" : "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [ "lambda.amazonaws.com" ]
+              },
+              "Action": [ "sts:AssumeRole" ]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "web-monitor",
+            "PolicyDocument": {
+              "Version" : "2012-10-17",
+              "Statement": [
+                {
+                  "Action" : [ "s3:GetObject", "s3:PutObject" ],
+                  "Effect" : "Allow",
+                  "Resource" : [
+                    { "Fn::Join": [ "", [ "arn:aws:s3:::", { "Ref" : "errorCountBucket" }, "/*" ] ] }
+                  ]
+                },
+                {
+                  "Action" : [ "sns:Publish" ],
+                  "Effect" : "Allow",
+                  "Resource" : [
+                    { "Ref" : "alertsTopic" }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+
+    "monitorFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Handler": "monitor.handler",
+        "Role": { "Fn::GetAtt" : ["monitorRole", "Arn"] },
+        "Code": {
+          "S3Bucket": { "Ref": "sourceBucket" },
+          "S3Key": { "Ref": "sourceKey" }
+        },
+        "Runtime": "nodejs",
+        "Timeout": "23"
+      }
+    }
+  },
+
+  "Outputs": {
+    "errorCountBucket": {
+      "Description": "S3 Bucket storing the error count",
+      "Value": { "Ref": "errorCountBucket" }
+    },
+    "alertsTopic": {
+      "Description": "SNS Topic to send alerts to",
+      "Value": { "Ref": "alertsTopic" }
+    },
+    "iamRole": {
+      "Description": "Role for this monitoring app",
+      "Value": { "Ref": "monitorRole" }
+    }
+  }
+}

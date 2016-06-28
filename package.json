@@ -1,0 +1,30 @@
+{
+  "name": "website-monitor",
+  "version": "1.0.0",
+  "description": "Monitor website pages and send SMS if the page is not available",
+  "main": "monitor.js",
+  "scripts": {
+    "package": "zip webmonitor.zip src package.json",
+    "create-aws-stack": "aws cloudformation create-stack --template-body file://cfn.json --parameters file://cfn-params.json --capabilities CAPABILITY_IAM --stack-name ",
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/quocvu/website-monitor.git"
+  },
+  "keywords": [
+    "webpage",
+    "website",
+    "monitor",
+    "sms",
+    "aws",
+    "sns",
+    "lambda"
+  ],
+  "author": "Quoc Vu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/quocvu/website-monitor/issues"
+  },
+  "homepage": "https://github.com/quocvu/website-monitor#readme"
+}
