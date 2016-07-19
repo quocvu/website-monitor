@@ -1,5 +1,15 @@
 {
+  "aws": {
+    "region": "a-region",
+    "sns": {
+      "alerts-topic": "a-topic"
+    },
+    "s3": {
+      "error-count-bucket": "a-bucket"
+    }
+  },
   "notice": {
-    "max-messages": 5
+    "max-messages": 5,
+    "date-format": "MM/DD H:mm"
   }
 }
