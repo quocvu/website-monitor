@@ -41,8 +41,10 @@
     "request": "^2.72.0"
   },
   "devDependencies": {
+    "coveralls": "^2.11.11",
     "istanbul": "^0.4.4",
     "mocha": "^2.3.4",
+    "mocha-lcov-reporter": "^1.2.0",
     "should": "^7.1.1",
     "sinon": "^1.17.2",
     "sinon-stub-promise": "^2.1.0"
