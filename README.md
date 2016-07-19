@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/quocvu/website-monitor.svg?branch=master)](http://img.shields.io/travis/quocvu/website-monitor.svg)
+[![Coverage Status](https://coveralls.io/repos/github/quocvu/website-monitor/badge.svg?branch=master)](https://img.shields.io/coveralls/quocvu/website-monitorl.svg)
+
 # website-monitor
 
 Monitor website pages and send SMS if the page is not available.
