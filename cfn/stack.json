@@ -8,24 +8,24 @@
   },
 
   "Parameters": {
-    "sourceBucket": {
+    "SourceBucket": {
       "Description": "S3 bucket containing the lambda function deployment package",
       "Type": "String"
     },
 
-    "sourceKey": {
+    "SourceKey": {
       "Description": "S3 object key of the lambda function deployment package",
       "Type": "String"
     },
 
-    "phoneNumber": {
+    "PhoneNumber": {
       "Description": "Phone number to send SMS messages to",
       "Type": "String"
     }
   },
 
   "Resources": {
-    "errorCountBucket": {
+    "ErrorCountBucket": {
       "Type": "AWS::S3::Bucket",
       "Properties": {
         "Tags": [
@@ -35,20 +35,34 @@
       }
     },
 
-    "alertsTopic": {
+    "AlertsTopic": {
       "Type": "AWS::SNS::Topic",
       "Properties": {
-        "DisplayName": "Website-monitor",
+        "DisplayName": "website-monitor",
         "Subscription": [
           {
-            "Endpoint": { "Ref": "phoneNumber" },
+            "Endpoint": { "Ref": "PhoneNumber" },
             "Protocol": "sms"
           }
         ]
       }
     },
 
-    "monitorRole": {
+    "LogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "RetentionInDays": 90
+      }
+    },
+
+    "LogStream": {
+      "Type": "AWS::Logs::LogStream",
+      "Properties": {
+        "LogGroupName": { "Ref": "LogGroup" }
+      }
+    },
+
+    "MonitorRole": {
       "Type": "AWS::IAM::Role",
       "Properties": {
         "Path": "/",
@@ -74,14 +88,21 @@
                   "Action" : [ "s3:GetObject", "s3:PutObject" ],
                   "Effect" : "Allow",
                   "Resource" : [
-                    { "Fn::Join": [ "", [ "arn:aws:s3:::", { "Ref" : "errorCountBucket" }, "/*" ] ] }
+                    { "Fn::Join": [ "", [ "arn:aws:s3:::", { "Ref" : "ErrorCountBucket" }, "/*" ] ] }
                   ]
                 },
                 {
                   "Action" : [ "sns:Publish" ],
                   "Effect" : "Allow",
                   "Resource" : [
-                    { "Ref" : "alertsTopic" }
+                    { "Ref" : "AlertsTopic" }
+                  ]
+                },
+                {
+                  "Action" : [ "logs:PutLogEvents", "logs:DescribeLogStreams", "logs:Create" ],
+                  "Effect" : "Allow",
+                  "Resource" : [
+                    "arn:aws:logs:*:*:*"
                   ]
                 }
               ]
@@ -91,33 +112,68 @@
       }
     },
 
-    "monitorFunction": {
+    "MonitorFunction": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
-        "Handler": "monitor.handler",
-        "Role": { "Fn::GetAtt" : ["monitorRole", "Arn"] },
+        "Handler": "monitor.allSites",
+        "Role": { "Fn::GetAtt" : ["MonitorRole", "Arn"] },
         "Code": {
-          "S3Bucket": { "Ref": "sourceBucket" },
-          "S3Key": { "Ref": "sourceKey" }
+          "S3Bucket": { "Ref": "SourceBucket" },
+          "S3Key": { "Ref": "SourceKey" }
         },
         "Runtime": "nodejs",
         "Timeout": "23"
+      }
+    },
+
+    "MonitorEvent": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "ScheduleExpression": "rate(15 minutes)",
+        "Targets": [
+          {
+            "Id": "MonitorScheduler",
+            "Arn": { "Fn::GetAtt": [ "MonitorFunction", "Arn" ] }
+          }
+        ]
+      }
+    },
+
+    "MonitorPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": { "Fn::GetAtt": [ "MonitorFunction", "Arn" ] },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "events.amazonaws.com",
+        "SourceArn": { "Fn::GetAtt": [ "MonitorEvent", "Arn" ] }
       }
     }
   },
 
   "Outputs": {
+    "monitorFunction": {
+      "Description": "Name of the Lambda function",
+      "Value": { "Ref": "MonitorFunction" }
+    },
     "errorCountBucket": {
       "Description": "S3 Bucket storing the error count",
-      "Value": { "Ref": "errorCountBucket" }
+      "Value": { "Ref": "ErrorCountBucket" }
     },
     "alertsTopic": {
       "Description": "SNS Topic to send alerts to",
-      "Value": { "Ref": "alertsTopic" }
+      "Value": { "Ref": "AlertsTopic" }
     },
     "iamRole": {
       "Description": "Role for this monitoring app",
-      "Value": { "Ref": "monitorRole" }
+      "Value": {"Fn::GetAtt": ["MonitorRole", "Arn"] }
+    },
+    "LogGroup": {
+      "Description": "Cloudwatch log group",
+      "Value": {"Ref": "LogGroup" }
+    },
+    "LogStream": {
+      "Description": "Cloudwatch log stream",
+      "Value": {"Ref": "LogStream" }
     }
   }
 }

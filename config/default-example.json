@@ -1,0 +1,26 @@
+{
+  "aws": {
+    "region": "us-east-1",
+    "sns": {
+      "alerts-topic": "arn:aws:sns:us-east-1:658xxxxxx124:stackname-AlertsTopic-1I8xxxxxxPMF2"
+    },
+    "s3": {
+      "error-count-bucket": "stackname-errorcountbucket-dvcxxxxxxhxb"
+    },
+    "cloudwatch": {
+      "group": "stackname-LogGroup-GL6xxxxxxA37",
+      "stream": "stackname-LogStream-WYJxxxxxxHTI"
+    }
+  },
+  "sites": [
+    {
+      "name": "my-precious-website",
+      "search": "string-pattern",
+      "url": "http://www.my-precious-website.com/pulseCheck"
+    }
+  ],
+  "notice": {
+    "max-messages": 5,
+    "date-format": "MM/DD H:mm"
+  }
+}

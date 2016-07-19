@@ -4,9 +4,13 @@
   "description": "Monitor website pages and send SMS if the page is not available",
   "main": "monitor.js",
   "scripts": {
-    "package": "zip webmonitor.zip src package.json",
-    "create-aws-stack": "aws cloudformation create-stack --template-body file://cfn.json --parameters file://cfn-params.json --capabilities CAPABILITY_IAM --stack-name ",
-    "test": "mocha"
+    "check": "node src/monitor.js",
+    "zip": "zip -r webmonitor.zip src config package.json node_modules",
+    "deploy": "aws lambda upload-function --function-zip webmonitor.zip --runtime nodejs4.3 --handler 'src/monitor.handler' --mode event",
+    "aws-stack": "aws cloudformation create-stack --template-body file://cfn/stack.json --parameters file://cfn/params.json --capabilities CAPABILITY_IAM --stack-name ",
+    "test": "NODE_ENV=test mocha",
+    "cover": "NODE_ENV=test istanbul cover _mocha",
+    "coveralls": "npm run cover -- --report lcovonly && cat ./coverage/lcov.info | coveralls"
   },
   "repository": {
     "type": "git",
@@ -26,5 +30,21 @@
   "bugs": {
     "url": "https://github.com/quocvu/website-monitor/issues"
   },
-  "homepage": "https://github.com/quocvu/website-monitor#readme"
+  "homepage": "https://github.com/quocvu/website-monitor#README.md",
+  "dependencies": {
+    "async": "^2.0.0-rc.6",
+    "aws-sdk": "^2.4.2",
+    "bunyan": "^1.8.1",
+    "bunyan-cloudwatch": "^2.0.0",
+    "config": "^1.21.0",
+    "moment": "^2.13.0",
+    "request": "^2.72.0"
+  },
+  "devDependencies": {
+    "istanbul": "^0.4.4",
+    "mocha": "^2.3.4",
+    "should": "^7.1.1",
+    "sinon": "^1.17.2",
+    "sinon-stub-promise": "^2.1.0"
+  }
 }
