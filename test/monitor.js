@@ -22,11 +22,11 @@ describe('monitor', function() {
     trace: sinon.spy()
   };
 
-  beforeEach(function () {
+  beforeEach(function() {
     sandbox = sinon.sandbox.create();
   });
 
-  afterEach(function () {
+  afterEach(function() {
     sandbox.restore();
   });
 

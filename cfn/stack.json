@@ -1,7 +1,7 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
 
-  "Description": "Standup SNS topic, subcription, and S3 bucket for this app to use",
+  "Description": "Standup SNS topic, subcription, and S3 bucket for web monitoring",
 
   "Metadata": {
     "Description": "Monitor website pages and send SMS if the page is not available"
@@ -84,6 +84,13 @@
             "PolicyDocument": {
               "Version" : "2012-10-17",
               "Statement": [
+                {
+                  "Action" : [ "s3:ListBucket" ],
+                  "Effect" : "Allow",
+                  "Resource" : [
+                    { "Fn::Join": [ "", [ "arn:aws:s3:::", { "Ref" : "ErrorCountBucket" } ] ] }
+                  ]
+                },
                 {
                   "Action" : [ "s3:GetObject", "s3:PutObject" ],
                   "Effect" : "Allow",

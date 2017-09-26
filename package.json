@@ -2,11 +2,11 @@
   "name": "website-monitor",
   "version": "1.0.0",
   "description": "Monitor website pages and send SMS if the page is not available",
-  "main": "monitor.js",
+  "main": "src/monitor.js",
   "scripts": {
     "check": "node src/monitor.js",
     "zip": "zip -r webmonitor.zip src config package.json node_modules",
-    "deploy": "aws lambda upload-function --function-zip webmonitor.zip --runtime nodejs4.3 --handler 'src/monitor.handler' --mode event",
+    "deploy": "aws lambda upload-function --function-zip webmonitor.zip --runtime nodejs4.3 --handler 'src/monitor.allSites' --mode event --function-name WebMonitorStack1-MonitorFunction-91I8MDNXY0LV --role arn:aws:iam::758357237134:role/WebMonitorStack1-MonitorRole-13UL3PW95II5",
     "aws-stack": "aws cloudformation create-stack --template-body file://cfn/stack.json --parameters file://cfn/params.json --capabilities CAPABILITY_IAM --stack-name ",
     "test": "NODE_ENV=test mocha",
     "cover": "NODE_ENV=test istanbul cover _mocha",

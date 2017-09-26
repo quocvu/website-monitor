@@ -10,39 +10,17 @@ var request = require('request');
 var aws = require('./aws');
 
 var exports = module.exports = {
-  /* istanbul ignore next */
-  logger: function() {
-    return bunyan.createLogger({
-      name: 'web-monitor',
-      streams: [
-        {
-          level: 'trace',
-          stream: process.stdout
-        },
-        {
-          level: 'trace',
-          type: 'raw',
-          stream: cloudwatchStream({
-            logGroupName: config.get('aws.cloudwatch.group'),
-            logStreamName: config.get('aws.cloudwatch.stream'),
-            cloudWatchLogsOptions: {
-              region: config.get('aws.region')
-            }
-          })
-        }
-      ]
-    });
-  },
 
   allSites: function() {
     var sites = config.get('sites');
-    var log = exports.logger();
+    var log = logger();
 
     async.each(sites, exports.checkSite.bind(exports.checkSite, log), function(err) {
       if (err) {
         log.error('Cannot check all sites', err);
       } else {
         log.info('Successfully checked', sites.length, 'sites');
+console.log('Successfully checked', sites.length, 'sites');
       }
     });
   },
@@ -151,4 +129,28 @@ var exports = module.exports = {
   }
 };
 
+
+/* istanbul ignore next */
+function logger() {
+  return bunyan.createLogger({
+    name: 'web-monitor',
+    streams: [
+      {
+        level: 'trace',
+        stream: process.stdout
+      },
+      {
+        level: 'trace',
+        type: 'raw',
+        stream: cloudwatchStream({
+          logGroupName: config.get('aws.cloudwatch.group'),
+          logStreamName: config.get('aws.cloudwatch.stream'),
+          cloudWatchLogsOptions: {
+            region: config.get('aws.region')
+          }
+        })
+      }
+    ]
+  });
+}
 
