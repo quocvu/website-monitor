@@ -38,7 +38,8 @@
     "bunyan-cloudwatch": "^2.0.0",
     "config": "^1.21.0",
     "moment": "^2.13.0",
-    "request": "^2.72.0"
+    "request": "^2.72.0",
+    "serverless": "^2.1.1"
   },
   "devDependencies": {
     "coveralls": "^2.11.11",
