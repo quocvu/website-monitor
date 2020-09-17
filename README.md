@@ -35,9 +35,9 @@ a copy of the parameter files, edit it to provide the correct values for `Source
 the Lambda function package), `PhoneNumber` receiving SMS monitoring alerts. Then run
 the CFN template.
 
-   $ cp cfn/params-example.json cfn/params.json
-   $ vi cfn/params.json
-   $ npm run aws-stack WebMonitorStack1
+    $ cp cfn/params-example.json cfn/params.json
+    $ vi cfn/params.json
+    $ npm run aws-stack WebMonitorStack1
 
 Once the CFN completes, look at its output, we are going to use these value to
 configure our Lambda function.
