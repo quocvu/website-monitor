@@ -20,7 +20,6 @@ var exports = module.exports = {
         log.error('Cannot check all sites', err);
       } else {
         log.info('Successfully checked', sites.length, 'sites');
-console.log('Successfully checked', sites.length, 'sites');
       }
     });
   },
@@ -153,4 +152,3 @@ function logger() {
     ]
   });
 }
-

@@ -39,3 +39,6 @@ jspm_packages
 config/default.json
 *.zip
 cfn/params.json
+
+# Serverless directories
+.serverless
