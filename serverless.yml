@@ -10,6 +10,12 @@ provider:
   name: aws
   runtime: nodejs12.x
 
+custom:
+  logGroup: ${file(./config/${opt:stage, 'default'}.json):aws.cloudwatch.log-group}
+  logStream: ${file(./config/${opt:stage, 'default'}.json):aws.cloudwatch.log-stream}
+  errorCountBucket: ${file(./config/${opt:stage, 'default'}.json):aws.s3.error-count-bucket}
+  alertsTopic: ${file(./config/${opt:stage, 'default'}.json):aws.sns.alerts-topic}
+
 functions:
   monitorAllSites:
     handler: monitor.allSites
@@ -22,9 +28,10 @@ resources:
     WebsiteMonitorErrorCountBucket:
       Type: AWS::S3::Bucket
       Properties:
+        BucketName: ${self:custom.errorCountBucket}
         Tags:
           -
-            Key: app,
+            Key: app
             Value: website-monitor
           -
             Key: usage
@@ -32,6 +39,7 @@ resources:
     WebsiteMonitorAlertsTopic:
       Type: AWS::SNS::Topic
       Properties:
+        TopicName: ${self:custom.alertsTopic}
         DisplayName: website-monitor
         Subscription:
           -
@@ -40,18 +48,19 @@ resources:
     WebsiteMonitorLogGroup:
       Type: AWS::Logs::LogGroup
       Properties:
+        LogGroupName: ${self:custom.logGroup}
         RetentionInDays: 90
     WebsiteMonitorLogStream:
       Type: AWS::Logs::LogStream
       Properties:
-        LogGroupName: WebsiteMonitorLogGroup
-
+        LogGroupName: ${self:custom.logGroup}
+        LogStreamName: ${self:custom.logStream}
     WebsiteMonitorRole:
-      Type: AWS::IAM::Role,
+      Type: AWS::IAM::Role
       Properties:
-        Path: '/'
+        Path: "/"
         AssumeRolePolicyDocument:
-          Version: 2012-10-17
+          Version: "2012-10-17"
           Statement:
             -
               Effect: Allow
@@ -64,46 +73,32 @@ resources:
           -
             PolicyName: website-monitor
             PolicyDocument:
-              Version : 2012-10-17
+              Version : "2012-10-17"
               Statement:
                 -
                   Action:
                     - s3:ListBucket
                   Effect: Allow
                   Resource:
-                    - 'Fn::Join':
-                      - ''
-                      -
-                        - 'arn:aws:s3:::'
-                        - Ref: WebsiteMonitorErrorCountBucket
+                    - "arn:aws:s3:::${self:custom.errorCountBucket}"
                 -
                   Action:
                     - s3:GetObject
                     - s3:PutObject
-                  Effect: Allow,
+                  Effect: Allow
                   Resource:
-                    - 'Fn::Join':
-                      - ''
-                      -
-                        - 'arn:aws:s3:::'
-                        - Ref: WebsiteMonitorErrorCountBucket
-                        - '/*'
+                    - "arn:aws:s3:::${self:custom.errorCountBucket}/*"
                 -
                   Action:
                     - 'sns:Publish'
                   Effect: Allow
                   Resource:
-                    - Ref: WebsiteMonitorAlertsTopic
+                    - "arn:aws:sns:::${self:custom.alertsTopic}"
                 -
                   Action:
-                    - 'logs:PutLogEvents'
-                    - 'logs:DescribeLogStreams'
-                    - 'logs:Create'
+                    - "logs:PutLogEvents"
+                    - "logs:DescribeLogStreams"
+                    - "logs:Create"
                   Effect: Allow
                   Resource:
-                    - 'arn:aws:logs:*:*:*'
-
-#  Outputs:
-#     NewOutput:
-#       Description: Description for the output
-#       Value: Some output value
+                    - "arn:aws:logs:*:*:*"
