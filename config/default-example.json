@@ -1,15 +1,16 @@
 {
   "aws": {
     "region": "us-east-1",
+    "account": "12xxxxxxxx89",
     "sns": {
-      "alerts-topic": "arn:aws:sns:us-east-1:658xxxxxx124:stackname-AlertsTopic-1I8xxxxxxPMF2"
+      "alerts-topic": "website-monitor-sns-alert-topic"
     },
     "s3": {
-      "error-count-bucket": "stackname-errorcountbucket-dvcxxxxxxhxb"
+      "error-count-bucket": "website-monitor-error-count-bucket"
     },
     "cloudwatch": {
-      "group": "stackname-LogGroup-GL6xxxxxxA37",
-      "stream": "stackname-LogStream-WYJxxxxxxHTI"
+      "log-group": "website-monitor-log-group",
+      "log-stream": "website-monitor-log-stream"
     }
   },
   "sites": [

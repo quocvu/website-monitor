@@ -96,7 +96,7 @@ var exports = module.exports = {
           async.parallel([
               aws.snsMessage.bind(aws.snsMessage,
                 site.name + ' is not working as expected (' + count + ') ' + moment().format(config.get('notice.date-format')),
-                'arn:aws:sns:' + config.get('aws.region') + ':' + config.get('aws.account') + ':' config.get('aws.sns.alerts-topic'),
+                'arn:aws:sns:' + config.get('aws.region') + ':' + config.get('aws.account') + ':' + config.get('aws.sns.alerts-topic'),
                 config.get('aws.region'),
                 log),
               aws.storeCount.bind(aws.storeCount,
