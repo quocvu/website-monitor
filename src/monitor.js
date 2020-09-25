@@ -54,8 +54,8 @@ var exports = module.exports = {
           async.parallel([
               aws.snsMessage.bind(
                 aws.snsMessage,
-                site.name + ' is back to normal ' + moment().format(config.get('notice.date-format')),
-                config.get('aws.sns.alerts-topic'),
+                moment().format(config.get('notice.date-format')) + ': ' + site.message.success,
+                'arn:aws:sns:' + config.get('aws.region') + ':' + config.get('aws.account') + ':' + config.get('aws.sns.alerts-topic'),
                 config.get('aws.region'),
                 log),
               aws.storeCount.bind(aws.storeCount,
@@ -95,7 +95,7 @@ var exports = module.exports = {
         if (count <= config.get('notice.max-messages')) {
           async.parallel([
               aws.snsMessage.bind(aws.snsMessage,
-                site.name + ' is not working as expected (' + count + ') ' + moment().format(config.get('notice.date-format')),
+                moment().format(config.get('notice.date-format')) + ': Notice #' + count + ' - ' + site.message.failure,
                 'arn:aws:sns:' + config.get('aws.region') + ':' + config.get('aws.account') + ':' + config.get('aws.sns.alerts-topic'),
                 config.get('aws.region'),
                 log),
